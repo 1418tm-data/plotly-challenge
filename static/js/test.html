@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<script src="https://d3js.org/d3.v2.js"></script>
+		<style>
+			select { position: absolute; left: 50px; top: 50px; }
+			p { position: absolute; left: 280px; top: 32px; }
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+// specify a format function we'll use later
+// https://github.com/mbostock/d3/wiki/Formatting
+var comma = d3.format(",");
+
+d3.json("cities.json", function(data) {
+
+	// create the drop down menu of cities
+	var selector = d3.select("body")
+		.append("select")
+		.attr("id", "cityselector")
+		.selectAll("option")
+		.data(data)
+		.enter().append("option")
+		.text(function(d) { return d.city; })
+		.attr("value", function (d, i) {
+			return i;
+		});
+
+	// generate a random index value and set the selector to the city
+	// at that index value in the data array
+	var index = Math.round(Math.random() * data.length);
+	d3.select("#cityselector").property("selectedIndex", index);
+
+	// append a paragraph tag to the body that shows the city name and it's population
+	d3.select("body")
+				.append("p")
+				.data(data)
+				.text(function(d){ 
+					return data[index]['city'] + " - population " + comma(data[index]['population']); 
+				})
+
+	// when the user selects a city, set the value of the index variable
+	// and call the update(); function
+	d3.select("#cityselector")
+	.on("change", function(d) {
+		index = this.value;
+		update();
+	})
+
+	// update the paragraph text to match the selection made by the user
+	function update(){
+		d3.selectAll("p")
+			.data(data)
+			.text(function(d){ 
+				return data[index]['city'] + " - population " + comma(data[index]['population']); 
+			})
+	}
+
+})
+		</script>
+	</body>
+</html>
